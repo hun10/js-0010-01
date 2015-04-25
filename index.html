@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Javascript 0010-01 Project</title>
+  <script src="elm.js"></script>
+</head>
+
+<body>
+  <h1>BW mode 512&times;256</h1>
+
+  <p>Using <a href="http://elm-lang.org">Elm</a>.</p>
+
+  <canvas id="screen" width="512" height="256"></canvas>
+</body>
+
+<script type="text/javascript">
+
+  var video = Elm.worker(Elm.Video);
+
+  var canvas = document.getElementById("screen");
+  var canvasWidth = canvas.width;
+  var canvasHeight = canvas.height;
+  var ctx = canvas.getContext('2d');
+  var imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+
+  var data = imageData.data;
+
+  video.ports.screenBuffer.subscribe(function(ram) {
+    var b = 0;
+    for (var i = 0; i < ram.length; i++) {
+      var v = ram[i];
+      for (var k = 0; k < 16; k++) {
+        var clr = (v & 1) * 255;
+        data[b++] = clr;
+        data[b++] = clr;
+        data[b++] = clr;
+        data[b++] = 255;
+        v = v >> 1;
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+  });
+</script>
+
+</html>
