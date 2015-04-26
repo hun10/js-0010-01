@@ -48,10 +48,12 @@ singleStep c =
   in  { c | reg <- Array.set 0 (op + 2) c.reg
           , bus <- write c.bus op 0 }
 
-st1 e = singleStep <| singleStep e
+repeatStep n e =
+  if | n == 0 -> e
+     | otherwise -> singleStep (repeatStep (n - 1) e)
 
 step clock c =
-  st1 c
+  repeatStep 10 c
 
 powerOnPattern : Int -> Int
 powerOnPattern n =
