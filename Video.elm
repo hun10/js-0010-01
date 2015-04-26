@@ -53,7 +53,7 @@ repeatStep n e =
      | otherwise -> singleStep (repeatStep (n - 1) e)
 
 step clock c =
-  repeatStep 10 c
+  repeatStep (min (60 * clock) 2400) c
 
 powerOnPattern : Int -> Int
 powerOnPattern n =
@@ -61,7 +61,7 @@ powerOnPattern n =
     then 0
     else fromDecOct 177777
 
-clock = Time.timestamp (Time.fps 25)
+clock = Time.fps 25
 
 port screenBuffer : Signal (Array.Array Int)
 port screenBuffer = map (\c -> c.bus.vram) (foldp step computer clock)
