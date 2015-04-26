@@ -22,7 +22,7 @@ int main(int argc, char ** argv) {
       printf("[ ");
       first = false;
     } else {
-      printf("\n  , ");
+      printf("\n           , ");
     }
     printf("%o", w16);
   }
