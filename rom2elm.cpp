@@ -9,7 +9,7 @@ int main(int argc, char ** argv) {
   printf("words = List.map fromDecOct decoctal\n");
   printf("\n");
   printf("fromDecOct : Int -> Int\n");
-  printf("fromDecOct n = if n == 0 then 0 else n %% 8 + 8 * (fromDecOct (n // 10))\n");
+  printf("fromDecOct n = if n == 0 then 0 else n %% 10 + 8 * (fromDecOct (n // 10))\n");
   printf("\n");
   printf("decoctal = ");
   bool first = true;

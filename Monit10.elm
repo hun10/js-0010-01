@@ -3,7 +3,7 @@ module Monit10 where
 words = List.map fromDecOct decoctal
 
 fromDecOct : Int -> Int
-fromDecOct n = if n == 0 then 0 else n % 8 + 8 * (fromDecOct (n // 10))
+fromDecOct n = if n == 0 then 0 else n % 10 + 8 * (fromDecOct (n // 10))
 
 decoctal = [ 167
            , 254
