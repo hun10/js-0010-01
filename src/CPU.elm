@@ -135,18 +135,26 @@ put a v s = { s | bus <-Array.set a v s.bus }
 type Accessor = Register Register
               | Address Int
 
-mproc : Method -> Int -> State -> (Accessor, State)
-mproc m i s = case m of
+mproc : Int -> Method -> State -> (Accessor, State)
+mproc i m s = case m of
            Plain     reg -> (Register reg, s)
            Increment reg -> (Address (read reg s), inc reg i s)
            Decrement reg -> let s1 = inc reg -i s in (Address (read reg s1), s1)
            Index     reg -> let (bs, s1) = get (read PC s) s
                          in (Address ((bs + read reg s1) `and` (oct 177777)), inc PC 2 s1)
 
-proc : Operand -> Int -> State -> (Accessor, State)
-proc o i s = case o of
-          Direct   m -> mproc m i s
-          Indirect m -> let (a, s1) = mproc m i s in case a of
+proc : Int -> Operand -> State -> (Accessor, State)
+proc i o s = case o of
+          Direct   m -> mproc i m s
+          Indirect m -> let (a, s1) = mproc i m s in case a of
                         Register reg -> (Address (read reg s1), s1)
                         Address  adr -> let (bs, s2) = get adr s1 in
                                         (Address bs, s2)
+
+pbyte = proc 1
+pword = proc 2
+
+cperform : Code -> State -> State
+cperform c s = case c of
+  JMP dest -> let (a, s1) = pword dest s in case a of
+              Address adr -> load PC adr s1
