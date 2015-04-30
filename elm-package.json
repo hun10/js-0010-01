@@ -4,7 +4,7 @@
     "repository": "https://github.com/hun10/js-0010-01.git",
     "license": "MIT",
     "source-directories": [
-        "."
+        "src"
     ],
     "exposed-modules": [],
     "dependencies": {
