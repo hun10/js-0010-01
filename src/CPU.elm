@@ -158,3 +158,8 @@ cperform : Code -> State -> State
 cperform c s = case c of
   JMP dest -> let (a, s1) = pword dest s in case a of
               Address adr -> load PC adr s1
+
+step : State -> State
+step s = let (c, s1) = get (read PC s) s in case dispatch c of
+         Nothing -> s
+         Just code -> cperform code (inc PC 2 s1)
