@@ -1,0 +1,15 @@
+{
+    "version": "1.0.0",
+    "summary": "Emulator of the soviet retro-computer.",
+    "repository": "https://github.com/hun10/js-0010-01.git",
+    "license": "MIT",
+    "source-directories": [
+        "."
+    ],
+    "exposed-modules": [],
+    "dependencies": {
+        "elm-lang/core": "2.0.0 <= v < 3.0.0",
+        "TheSeamau5/elm-loop": "1.0.0 <= v < 2.0.0"
+    },
+    "elm-version": "0.15.0 <= v < 0.16.0"
+}

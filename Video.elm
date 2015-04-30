@@ -4,6 +4,7 @@ import Array
 import Bitwise exposing (and, shiftRight)
 import Signal exposing (..)
 import Time
+import Loop
 
 import Monit10 exposing (fromDecOct)
 
@@ -48,9 +49,7 @@ singleStep c =
   in  { c | reg <- Array.set 0 (op + 2) c.reg
           , bus <- write c.bus op 0 }
 
-repeatStep n e =
-  if | n == 0 -> e
-     | otherwise -> singleStep (repeatStep (n - 1) e)
+repeatStep n e = Loop.iterate (floor n) e singleStep
 
 step clock c =
   repeatStep (min (60 * clock) 2400) c
