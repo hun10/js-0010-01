@@ -1,5 +1,6 @@
 module CPU where
 
+import Array   exposing (Array)
 import Bitwise exposing (..)
 import List
 import Maybe   exposing (..)
@@ -83,3 +84,69 @@ opSSDD c = let o = c `and` (oct 170000)
              | otherwise      -> Nothing
 
 dispatch c = oneOf (List.map (\f -> f c) [ opSSDD, opRDD, opDD, opR, opvoid ])
+
+type alias Bus = Array Int
+
+type alias State = {
+    r0 : Int
+  , r1 : Int
+  , r2 : Int
+  , r3 : Int
+  , r4 : Int
+  , r5 : Int
+  , sp : Int
+  , pc : Int
+  , bus : Bus }
+
+read : Register -> State -> Int
+read r s = case r of
+           R0 -> s.r0
+           R1 -> s.r1
+           R2 -> s.r2
+           R3 -> s.r3
+           R4 -> s.r4
+           R5 -> s.r5
+           SP -> s.sp
+           PC -> s.pc
+
+load : Register -> Int -> State -> State
+load r v s = let vm = v `and` (oct 177777)
+          in case r of
+             R0 -> { s | r0 <- vm }
+             R1 -> { s | r1 <- vm }
+             R2 -> { s | r2 <- vm }
+             R3 -> { s | r3 <- vm }
+             R4 -> { s | r4 <- vm }
+             R5 -> { s | r5 <- vm }
+             SP -> { s | sp <- vm }
+             PC -> { s | pc <- vm }
+
+inc : Register -> Int -> State -> State
+inc r v s = load r (v + read r s) s
+
+get : Int -> State -> (Int, State)
+get a s = let v = Array.get a s.bus in case v of
+            Just x -> (x, s)
+
+put : Int -> Int -> State -> State
+put a v s = { s | bus <-Array.set a v s.bus }
+
+
+type Accessor = Register Register
+              | Address Int
+
+mproc : Method -> Int -> State -> (Accessor, State)
+mproc m i s = case m of
+           Plain     reg -> (Register reg, s)
+           Increment reg -> (Address (read reg s), inc reg i s)
+           Decrement reg -> let s1 = inc reg -i s in (Address (read reg s1), s1)
+           Index     reg -> let (bs, s1) = get (read PC s) s
+                         in (Address ((bs + read reg s1) `and` (oct 177777)), inc PC 2 s1)
+
+proc : Operand -> Int -> State -> (Accessor, State)
+proc o i s = case o of
+          Direct   m -> mproc m i s
+          Indirect m -> let (a, s1) = mproc m i s in case a of
+                        Register reg -> (Address (read reg s1), s1)
+                        Address  adr -> let (bs, s2) = get adr s1 in
+                                        (Address bs, s2)
