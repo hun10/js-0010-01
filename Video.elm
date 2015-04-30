@@ -6,7 +6,8 @@ import Signal exposing (..)
 import Time
 import Loop
 
-import Monit10 exposing (fromDecOct)
+import Monit10
+import Util exposing (oct)
 
 type alias Devices = {
     ram : Array.Array Int
@@ -24,22 +25,22 @@ read : Devices -> Int -> Maybe Int
 read dev address =
   let get = (\mask -> Array.get ((address `and` mask) `shiftRight` 1)) in
   if | address < 0                 -> Nothing
-     | address < fromDecOct 40000  -> get (fromDecOct 37777) dev.ram
-     | address < fromDecOct 100000 -> get (fromDecOct 37777) dev.vram
-     | address < fromDecOct 120000 -> get (fromDecOct 17777) dev.rom10
+     | address < oct 40000  -> get (oct 37777) dev.ram
+     | address < oct 100000 -> get (oct 37777) dev.vram
+     | address < oct 120000 -> get (oct 17777) dev.rom10
      | otherwise                   -> Nothing
 
 write : Devices -> Int -> Int -> Devices
 write dev address value =
   let set = (\mask -> Array.set ((address `and` mask) `shiftRight` 1) value) in
   if | address < 0                 -> dev
-     | address < fromDecOct 40000  -> { dev | ram <- set (fromDecOct 37777) dev.ram }
-     | address < fromDecOct 100000 -> { dev | vram <- set (fromDecOct 37777) dev.vram }
-     | address < fromDecOct 120000 -> dev
+     | address < oct 40000  -> { dev | ram <- set (oct 37777) dev.ram }
+     | address < oct 100000 -> { dev | vram <- set (oct 37777) dev.vram }
+     | address < oct 120000 -> dev
      | otherwise                   -> dev
 
 computer = {
-    reg = Array.fromList [fromDecOct 40000, 0, 0, 0, 0, 0, 0, fromDecOct 100000]
+    reg = Array.fromList [oct 40000, 0, 0, 0, 0, 0, 0, oct 100000]
   , pws = 0
   , bus = devices
   }
@@ -56,9 +57,9 @@ step clock c =
 
 powerOnPattern : Int -> Int
 powerOnPattern n =
-  if (n `and` (fromDecOct 200)) `shiftRight` 7 == n % 2
+  if (n `and` (oct 200)) `shiftRight` 7 == n % 2
     then 0
-    else fromDecOct 177777
+    else oct 177777
 
 clock = Time.fps 25
 
