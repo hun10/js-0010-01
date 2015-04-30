@@ -1,15 +1,19 @@
 #include <stdio.h>
+#include <string>
 
 int main(int argc, char ** argv) {
   if (argc != 2) {
-    fprintf(stderr, "No ROM file\n");
+    fprintf(stderr, "Usage: %s <ROM-file without .rom extension>\n", argv[0]);
     return 1;
   }
-  freopen(argv[1], "rb", stdin);
-  printf("words = List.map fromDecOct decoctal\n");
+  std::string filename = argv[1];
+  filename += ".rom";
+  freopen(filename.c_str(), "rb", stdin);
+  printf("module %s where\n", argv[1]);
   printf("\n");
-  printf("fromDecOct : Int -> Int\n");
-  printf("fromDecOct n = if n == 0 then 0 else n %% 10 + 8 * (fromDecOct (n // 10))\n");
+  printf("import Util\n");
+  printf("\n");
+  printf("words = List.map Util.oct decoctal\n");
   printf("\n");
   printf("decoctal = ");
   bool first = true;
